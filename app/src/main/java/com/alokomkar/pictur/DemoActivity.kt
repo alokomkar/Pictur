@@ -1,8 +1,8 @@
 package com.alokomkar.pictur
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import com.alokomkar.pictur.core.Pictur
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -39,7 +39,7 @@ class DemoActivity : AppCompatActivity() {
     }
 
     private fun loadImage(imageUrl: String) {
-        pictur.loadImage(imageUrl, R.mipmap.ic_launcher_round, R.drawable.ic_error, ivCatPic) { inProgress, _ ->
+        pictur.loadImage(imageUrl, R.mipmap.ic_launcher_round, ivCatPic) { inProgress, _ ->
             pbImageLoading.visibility = if( inProgress ) View.VISIBLE else View.GONE
         }
     }

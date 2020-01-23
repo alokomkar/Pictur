@@ -1,9 +1,6 @@
 package com.alokomkar.pictur.core
 
 import android.content.Context
-import android.content.res.Resources
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.util.Log
 import android.widget.ImageView
 import com.alokomkar.pictur.cache.CacheRepository
@@ -23,16 +20,13 @@ class Pictur private constructor(
     private val networkManager : NetworkManager by lazy { NetworkManager.getInstance() }
     private val disposable : CompositeDisposable by lazy { CompositeDisposable() }
     private val cacheRepository : CacheRepository by lazy { CacheRepository(context.cacheDir, cacheSize, disposable) }
-    private val resources: Resources by lazy { context.resources }
 
     @Synchronized
-    fun loadImage( imageUrl : String, placeHolder : Int = -1, errorPlaceHolder: Int, target: ImageView, progressListener: ((inProgress : Boolean, progress: Int) -> Unit)? ) {
+    fun loadImage( imageUrl : String, placeHolder : Int = -1, target: ImageView, progressListener: ((inProgress : Boolean, progress: Int) -> Unit)? ) {
 
         if( placeHolder != -1 )
             target.setImageResource(placeHolder)
         progressListener?.invoke(true, 0)
-
-        val errorBitmap = BitmapFactory.decodeResource(resources, errorPlaceHolder)
 
         val memoryCacheObservable = Maybe
             .fromCallable { cacheRepository.get(imageUrl) }
@@ -41,9 +35,9 @@ class Pictur private constructor(
 
         val networkObservable = Flowable.defer {
             networkManager
-                .loadImage(imageUrl, errorBitmap)
-                .doOnNext { bitmap -> cacheRepository.put(imageUrl, bitmap) }
-        }.toObservable()
+                .loadImage(imageUrl)
+                .doOnNext { bitmap -> if( bitmap != null ) cacheRepository.put(imageUrl, bitmap) }
+        }.onBackpressureLatest().toObservable()
 
         disposable.add(Observable
             .merge(memoryCacheObservable, networkObservable)
