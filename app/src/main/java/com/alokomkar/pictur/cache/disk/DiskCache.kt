@@ -128,6 +128,9 @@ class DiskCache private constructor(private val cacheDirectory: File,
     private fun readBitmapFromFile(foundCacheFile: File): Bitmap? {
         try {
             val fileInputStream = FileInputStream(foundCacheFile)
+            //Remove and update last modified time stamp
+            lruEntries.remove(foundCacheFile.absolutePath)
+            lruEntries[foundCacheFile.absolutePath] = foundCacheFile.lastModified()
             return BitmapFactory.decodeStream(fileInputStream)
         } catch (e: FileNotFoundException) {
             e.printStackTrace()

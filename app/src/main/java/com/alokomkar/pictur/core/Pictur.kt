@@ -21,7 +21,6 @@ class Pictur private constructor(
     private val disposable : CompositeDisposable by lazy { CompositeDisposable() }
     private val cacheRepository : CacheRepository by lazy { CacheRepository(context.cacheDir, cacheSize, disposable) }
 
-    @Synchronized
     fun loadImage( imageUrl : String, placeHolder : Int = -1, target: ImageView, progressListener: ((inProgress : Boolean, progress: Int) -> Unit)? ) {
 
         if( placeHolder != -1 )
